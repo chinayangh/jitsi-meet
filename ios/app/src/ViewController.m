@@ -28,6 +28,9 @@
     JitsiMeetView *view = (JitsiMeetView *) self.view;
 
     view.delegate = self;
+    // Picture-in-Picture requires the SDK to be used within an app which has
+    // something to display when the mode is entered, so disable it for the app.
+    view.pipAvailable = NO;
     // As this is the Jitsi Meet app (i.e. not the Jitsi Meet SDK), we do want
     // the Welcome page to be enabled. It defaults to disabled in the SDK at the
     // time of this writing but it is clearer to be explicit about what we want
@@ -66,6 +69,10 @@ void _onJitsiMeetViewDelegateEvent(NSString *name, NSDictionary *data) {
 
 - (void)loadConfigError:(NSDictionary *)data {
     _onJitsiMeetViewDelegateEvent(@"LOAD_CONFIG_ERROR", data);
+}
+
+- (void)requestPipMode:(NSDictionary *)data {
+    _onJitsiMeetViewDelegateEvent(@"REQUEST_PIP_MODE", data);
 }
 
 #endif

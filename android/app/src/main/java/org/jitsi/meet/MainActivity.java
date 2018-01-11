@@ -16,6 +16,7 @@
 
 package org.jitsi.meet;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -95,7 +96,14 @@ public class MainActivity extends JitsiMeetActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // As this is the Jitsi Meet app (i.e. not the Jitsi Meet SDK), we do
-        // want the Welcome page to be enabled. It defaults to disabled in the
+        // want to enable some options.
+
+        // Picture-in-Picture support is nice to have, but it's only supported
+        // on Android >= 26 (Oreo).
+        setPictureInPictureAvailable(
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O);
+
+        // The welcome page defaults to disabled in the
         // SDK at the time of this writing but it is clearer to be explicit
         // about what we want anyway.
         setWelcomePageEnabled(true);

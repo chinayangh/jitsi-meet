@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,10 +29,14 @@ import android.widget.FrameLayout;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -64,6 +69,7 @@ public class JitsiMeetView extends FrameLayout {
             new AppInfoModule(reactContext),
             new AudioModeModule(reactContext),
             new ExternalAPIModule(reactContext),
+            new PictureInPictureModule(reactContext),
             new ProximityModule(reactContext),
             new WiFiStatsModule(reactContext)
         );
@@ -238,6 +244,25 @@ public class JitsiMeetView extends FrameLayout {
     }
 
     /**
+     * Helper function to send an event to JavaScript.
+     *
+     * @param eventName {@code String} containing the event name.
+     * @param params {@code WritableMap} optional ancillary data for the event.
+     */
+    private static void sendEvent(
+            String eventName, @Nullable WritableMap params) {
+        if (reactInstanceManager != null) {
+            ReactContext reactContext
+                = reactInstanceManager.getCurrentReactContext();
+            if (reactContext != null) {
+                reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(eventName, params);
+            }
+        }
+    }
+
+    /**
      * The default base {@code URL} used to join a conference when a partial URL
      * (e.g. a room name only) is specified to {@link #loadURLString(String)} or
      * {@link #loadURLObject(Bundle)}.
@@ -257,6 +282,11 @@ public class JitsiMeetView extends FrameLayout {
      * Jitsi Meet.
      */
     private JitsiMeetViewListener listener;
+
+    /**
+     * Whether Picture-in-Picture is available.
+     */
+    private boolean pipAvailable;
 
     /**
      * React Native root view.
@@ -323,6 +353,17 @@ public class JitsiMeetView extends FrameLayout {
     }
 
     /**
+     * Gets whether Picture-in-Picture is currently available. It's only
+     * supported on Android API >= 26 (Oreo), so it should not be enabled on
+     * older platform versions.
+     *
+     * @return {@code true} if PiP is available, {@code false} otherwise.
+     */
+    public boolean getPictureInPictureAvailable() {
+        return pipAvailable;
+    }
+
+    /**
      * Gets whether the Welcome page is enabled. If {@code true}, the Welcome
      * page is rendered when this {@code JitsiMeetView} is not at a URL
      * identifying a Jitsi Meet conference/room.
@@ -363,12 +404,18 @@ public class JitsiMeetView extends FrameLayout {
         if (defaultURL != null) {
             props.putString("defaultURL", defaultURL.toString());
         }
+
         // externalAPIScope
         props.putString("externalAPIScope", externalAPIScope);
+
+        // pipAvailable
+        props.putBoolean("pipAvailable", pipAvailable);
+
         // url
         if (urlObject != null) {
             props.putBundle("url", urlObject);
         }
+
         // welcomePageEnabled
         props.putBoolean("welcomePageEnabled", welcomePageEnabled);
 
@@ -436,6 +483,16 @@ public class JitsiMeetView extends FrameLayout {
      */
     public void setListener(JitsiMeetViewListener listener) {
         this.listener = listener;
+    }
+
+    /**
+     * Sets whether Picture-in-Picture is currently available.
+     *
+     * @param pipAvailable {@code true} if PiP is available, {@code false}
+     * otherwise.
+     */
+    public void setPictureInPictureAvailable(boolean pipAvailable) {
+        this.pipAvailable = pipAvailable;
     }
 
     /**

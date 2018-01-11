@@ -42,6 +42,14 @@ type Props = {
     _connecting: boolean,
 
     /**
+     * The indicator which determines if the application is currently being
+     * displayed in Picture-in-Picture mode.
+     *
+     * @private
+     */
+    _inPipMode: boolean,
+
+    /**
      * The handler which dispatches the (redux) action connect.
      *
      * @private
@@ -171,6 +179,83 @@ class Conference extends Component<Props> {
     }
 
     /**
+     * Renders the callee info component, unless the application is in PiP mode.
+     *
+     * @returns {ReactElement}
+     * @private
+     */
+    _renderCalleeInfo() {
+        if (!this.props._inPipMode) {
+            return <CalleeInfoContainer />;
+        }
+    }
+
+    /**
+     * Renders a connecting indicator, if applicable.
+     *
+     * @returns {ReactElement}
+     * @private
+     */
+    _renderConnectingIndicator() {
+        if (this.props._connecting) {
+            return (
+                <TintedView>
+                    <LoadingIndicator />
+                </TintedView>
+            );
+        }
+    }
+
+    /**
+     * Renders the container for dialogs, unless in PiP mode.
+     *
+     * @returns {ReactElement}
+     * @private
+     */
+    _renderDialogs() {
+        if (!this.props._inPipMode) {
+            return <DialogContainer />;
+        }
+    }
+
+    /**
+     * Renders the {@code Filmstrip}  and {@code Toolbox} components, unless
+     * in PiP mode.
+     *
+     * @returns {ReactElement}
+     * @private
+     */
+    _renderFilmstripAndToolbox() {
+        /*
+         * The Toolbox is in a stacking layer bellow the Filmstrip.
+         *
+         * The Filmstrip is in a stacking layer above the LargeVideo. The
+         * LargeVideo and the Filmstrip form what the Web/React app calls
+         * "videospace". Presumably, the name and grouping stem from the fact
+         * that these two React Components depict the videos of the conference's
+         * participants.
+         */
+        if (!this.props._inPipMode) {
+            return (
+                <View style = { styles.toolboxAndFilmstripContainer } >
+                    <Toolbox />
+                    <Filmstrip />
+                </View>
+            );
+        }
+    }
+
+    /**
+     * Renders the {@code LargeView} component.
+     *
+     * @returns {ReactElement}
+     * @private
+     */
+    _renderLargeView() {
+        return <LargeVideo />;
+    }
+
+    /**
      * Implements React's {@link Component#render()}.
      *
      * @inheritdoc
@@ -187,44 +272,30 @@ class Conference extends Component<Props> {
 
                 {/*
                   * The LargeVideo is the lowermost stacking layer.
-                  */}
-                <LargeVideo />
+                  */
+                    this._renderLargeView() }
 
                 {/*
                   * If there is a ringing call, show the callee's info.
-                  */}
-                <CalleeInfoContainer />
+                  */
+                    this._renderCalleeInfo() }
 
                 {/*
                   * The activity/loading indicator goes above everything, except
                   * the toolbox/toolbars and the dialogs.
                   */
-                    this.props._connecting
-                        && <TintedView>
-                            <LoadingIndicator />
-                        </TintedView>
-                }
+                    this._renderConnectingIndicator() }
 
-                <View style = { styles.toolboxAndFilmstripContainer } >
-                    {/*
-                      * The Toolbox is in a stacking layer bellow the Filmstrip.
-                      */}
-                    <Toolbox />
-                    {/*
-                      * The Filmstrip is in a stacking layer above the
-                      * LargeVideo. The LargeVideo and the Filmstrip form what
-                      * the Web/React app calls "videospace". Presumably, the
-                      * name and grouping stem from the fact that these two
-                      * React Components depict the videos of the conference's
-                      * participants.
-                      */}
-                    <Filmstrip />
-                </View>
+                {/*
+                  * When in picture-in-picture mode, hide the filmstrip and
+                  * toolbox/toolbar.
+                  */
+                    this._renderFilmstripAndToolbox() }
 
                 {/*
                   * The dialogs are in the topmost stacking layers.
-                  */}
-                <DialogContainer />
+                  */
+                    this._renderDialogs() }
             </Container>
         );
     }
@@ -391,6 +462,15 @@ function _mapStateToProps(state) {
          * @type {boolean}
          */
         _connecting: Boolean(connecting_),
+
+        /**
+         * The indicator which determines if the application is currently being
+         * displayed in Picture-in-Picture mode.
+         *
+         * @private
+         * @type {boolean}
+         */
+        _inPipMode: state['features/pip'].inPipMode,
 
         /**
          * The indicator which determines whether the Toolbox is visible.

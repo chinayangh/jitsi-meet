@@ -25,6 +25,8 @@
 
 @property (copy, nonatomic, nullable) NSURL *defaultURL;
 
+@property (nonatomic) BOOL pipAvailable;
+
 @property (nonatomic) BOOL welcomePageEnabled;
 
 +             (BOOL)application:(UIApplication *_Nonnull)application
@@ -44,5 +46,7 @@
 - (void)loadURLObject:(NSDictionary * _Nullable)urlObject;
 
 - (void)loadURLString:(NSString * _Nullable)urlString;
+
+- (void)onPictureInPictureModeChanged:(BOOL)isInPictureInPictureMode;
 
 @end

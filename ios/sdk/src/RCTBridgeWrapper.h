@@ -18,6 +18,7 @@
 
 #import <React/RCTBridge.h>
 #import <React/RCTBridgeDelegate.h>
+#import <React/RCTEventDispatcher.h>
 
 /**
  * A wrapper around the `RCTBridge` which implements the delegate methods
@@ -35,5 +36,6 @@
 @property (nonatomic, readonly, strong)  RCTBridge *bridge;
 
 - (instancetype)initWithLaunchOptions:(NSDictionary *)launchOptions;
+- (void)sendEventWithName:(NSString *)name body:(NSDictionary *)body;
 
 @end

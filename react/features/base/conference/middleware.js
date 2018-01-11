@@ -190,6 +190,10 @@ function _pinParticipant(store, next, action) {
     const participantById = getParticipantById(participants, id);
     let pin;
 
+    if (typeof conference === 'undefined') {
+        return next(action);
+    }
+
     if (typeof APP !== 'undefined') {
         const pinnedParticipant = getPinnedParticipant(participants);
         const actionName
@@ -316,9 +320,11 @@ function _setLastN(store, next, action) {
 function _setReceiveVideoQuality({ dispatch, getState }, next, action) {
     const { audioOnly, conference } = getState()['features/base/conference'];
 
-    conference.setReceiverVideoConstraint(action.receiveVideoQuality);
-    if (audioOnly) {
-        dispatch(toggleAudioOnly());
+    if (conference) {
+        conference.setReceiverVideoConstraint(action.receiveVideoQuality);
+        if (audioOnly) {
+            dispatch(toggleAudioOnly());
+        }
     }
 
     return next(action);

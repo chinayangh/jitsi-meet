@@ -15,6 +15,8 @@ import { ASPECT_RATIO_NARROW, ASPECT_RATIO_WIDE } from './constants';
  * }}
  */
 export function setAspectRatio(width: number, height: number): Object {
+    console.log(`XXXX ASPECT RATIO - w: ${width} h: ${height}`);
+
     return {
         type: SET_ASPECT_RATIO,
         aspectRatio: width < height ? ASPECT_RATIO_NARROW : ASPECT_RATIO_WIDE

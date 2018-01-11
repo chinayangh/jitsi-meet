@@ -33,6 +33,10 @@
     return self;
 }
 
+- (void)sendEventWithName:(NSString *)name body:(NSDictionary *)body {
+    [_bridge.eventDispatcher sendDeviceEventWithName:name body:body];
+}
+
 #pragma mark helper methods for getting the packager URL
 
 #if DEBUG

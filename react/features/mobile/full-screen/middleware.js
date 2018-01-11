@@ -4,6 +4,7 @@ import { StatusBar } from 'react-native';
 import { Immersive } from 'react-native-immersive';
 
 import { APP_STATE_CHANGED } from '../background';
+import { PIP_MODE_CHANGED } from '../picture-in-picture';
 import {
     CONFERENCE_FAILED,
     CONFERENCE_LEFT,
@@ -34,6 +35,7 @@ MiddlewareRegistry.register(({ getState }) => next => action => {
     case APP_STATE_CHANGED:
     case CONFERENCE_WILL_JOIN:
     case HIDE_DIALOG:
+    case PIP_MODE_CHANGED:
     case SET_AUDIO_ONLY: {
         // Check if we just came back from the background and re-enable full
         // screen mode if necessary.
